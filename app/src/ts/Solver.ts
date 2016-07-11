@@ -38,8 +38,8 @@ class WordSearch implements Grid {
             r.splice(0, 0, WALL);
             r.push(WALL);
         }
-        grid.splice(0, 0, new Array(cols+2).map(_ => WALL));
-        grid.push(new Array(cols+2).map(_ => WALL));
+        grid.splice(0, 0, new Array<string>(cols+2).map(_ => WALL));
+        grid.push(new Array<string>(cols+2).map(_ => WALL));
 
         // Insert into the grid property
         this.contents = grid;
@@ -50,25 +50,35 @@ class WordSearch implements Grid {
 }
 
 class WordSearchSolver {
-    protected grid: WordSearch;
+    private grid: WordSearch;
     private words: string[];
-    private matches: number[][];
-    constructor(grid: WordSearch, words: string[]) {
+    private matches: any;
+
+    constructor(grid: WordSearch, words: string[], options = {
+        caseSensitive: true
+    }) {
+        // Implement options
+        if (options.hasOwnProperty('caseSensitive') && options.caseSensitive === true) {
+            grid.contents = grid.contents.map(a => {
+                return a.map(b => b.toUpperCase());
+            });
+            words = words.map(w => w.toUpperCase());
+        }
+
         this.grid = grid;
         this.words = words;
-        this.matches = [];
+        this.matches = {};
     }
-    public searchWord(row: number, col: number, dir: { r: number, c: number }, match: string) {
-        let matchSlice: string = match;
-
-        for (let r=-1;r<=1;r++) {
+    public searchWord(row: number, col: number, match: string) {
+        path: for (let r=-1;r<=1;r++) {
             for (let c=-1;c<=1;c++) {
-                for (let w of matchSlice) {
-                    if (this.grid.contents[row+r][col+c] !== w) {
+                for (let w=0;w<match.length;w++) {
+                    if (this.grid.contents[row+r*w][col+c*w] !== match[w]) {
                         break;
-                    } else if (w === matchSlice.slice(-1) && this.grid.contents[row+r][col+c] === w) {
+                    } else if (w === match.length && this.grid.contents[row+r*w][col+c*w] === match[w]) {
                         // Last character in the match and the found character matches
-                        this.matches.push([row, col, r, c]);
+                        this.matches[match] = [row, col, r, c];
+                        break path;
                     }
                 }
             }
