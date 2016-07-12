@@ -4,6 +4,7 @@ interface Grid {
     rows: number;
     cols: number;
     contents: Array<string|number>[];
+    cell: (r: number, c: number, n: string | number) => string | number | void;
 }
 
 class WordSearch implements Grid {
@@ -43,6 +44,14 @@ class WordSearch implements Grid {
 
         // Insert into the grid property
         this.contents = grid;
+    }
+    public cell(row: number, col: number, n: string = undefined): string | void {
+        if (void n) {
+            return this.contents[row][col]
+        } else {
+            this.contents[row][col] = n;
+            return;
+        }
     }
     private cellsToRow(cells: string): string[] {
         return cells.split("|").map(x => x.trim());
