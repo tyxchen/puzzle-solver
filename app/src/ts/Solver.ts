@@ -61,7 +61,7 @@ class WordSearch implements Grid {
 class WordSearchSolver {
     private grid: WordSearch;
     private words: string[];
-    private matches: any;
+    private matches: Object;
 
     constructor(grid: WordSearch, words: string[], options = {
         caseSensitive: true
@@ -78,7 +78,7 @@ class WordSearchSolver {
         this.words = words;
         this.matches = {};
     }
-    public searchWord(row: number, col: number, match: string) {
+    public searchWord(row: number, col: number, match: string): void {
         path: for (let r=-1;r<=1;r++) {
             for (let c=-1;c<=1;c++) {
                 for (let w=0;w<match.length;w++) {
@@ -91,6 +91,23 @@ class WordSearchSolver {
                     }
                 }
             }
+        }
+    }
+    public solve(): Object {
+        for (let w of this.words) {
+            for (let r=1;r<=this.grid.rows;r++) {
+                for (let c=1;c<=this.grid.cols;c++) {
+                    if (this.grid.cell(r, c) === w[0]) {
+                        this.searchWord(r, c, w);
+                    }
+                }
+            }
+        }
+
+        if (Object.keys(this.matches).length === this.words.length) {
+            return this.matches;
+        } else {
+            throw new Error("Error: Incorrect number of matches");
         }
     }
 }
